@@ -10,7 +10,7 @@ class LocalesController extends Controller
 {
     public function get()
     {
-        return Response::json(Translations::getLocales());
+        return Response::json(Translations::getLocales()->sort());
     }
 
     public function store(StoreRequest $request)

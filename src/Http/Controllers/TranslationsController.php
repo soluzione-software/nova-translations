@@ -13,21 +13,12 @@ class TranslationsController extends Controller
 {
     public function get(string $locale)
     {
-        $translations = Translations::getTranslations($locale);
+        $translations = Translations::getTranslations($locale)
+            ->sortBy(function (array $item) {
+                return $item['namespace'].'_'.$item['key'];
+            });
 
-        array_walk(
-            $translations,
-            function (string &$value, string $key) {
-                $namespaceKey = explode('::', $key, 2);
-                $value = [
-                    'namespace' => count($namespaceKey) === 1 ? null : $namespaceKey[0],
-                    'key' => Arr::last($namespaceKey),
-                    'value' => $value,
-                ];
-            }
-        );
-
-        return Response::json(array_values($translations));
+        return Response::json(array_values($translations->all()));
     }
 
     public function store(string $locale, StoreRequest $request)
