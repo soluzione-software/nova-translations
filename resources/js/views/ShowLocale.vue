@@ -165,6 +165,10 @@ export default {
         selectPage(page) {
             this.updateQueryString({[this.pageParameter]: page})
         },
+
+        formatNumber(number) {
+            return Nova.formatNumber ? Nova.formatNumber(number) : number;
+        },
     },
     computed: {
         translations() {
@@ -196,9 +200,9 @@ export default {
 
             return (
                 this.translations.length &&
-                `${Nova.formatNumber(first + 1)}-${Nova.formatNumber(
+                `${this.formatNumber(first + 1)}-${this.formatNumber(
                     first + this.translations.length
-                )} ${this.__('of')} ${Nova.formatNumber(this.allMatchingCount)}`
+                )} ${this.__('of')} ${this.formatNumber(this.allMatchingCount)}`
             )
         },
 
