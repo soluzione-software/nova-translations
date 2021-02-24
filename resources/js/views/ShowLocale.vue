@@ -52,27 +52,44 @@
                     </div>
                 </div>
 
-                <Table v-else :items="translations">
-                    <template #head>
-                        <th class="text-left">
-                            <span>{{ __('nova-translations::namespace') }}</span>
-                        </th>
-                        <th class="text-left">
-                            <span>{{ __('nova-translations::key') }}</span>
-                        </th>
-                        <th class="text-left">
-                            <span>{{ __('nova-translations::value') }}</span>
-                        </th>
-                    </template>
+                <template v-else>
+                    <Table :items="translations">
+                        <template #head>
+                            <th class="text-left">
+                                <span>{{ __('nova-translations::namespace') }}</span>
+                            </th>
+                            <th class="text-left">
+                                <span>{{ __('nova-translations::key') }}</span>
+                            </th>
+                            <th class="text-left">
+                                <span>{{ __('nova-translations::value') }}</span>
+                            </th>
+                        </template>
 
-                    <TranslationsTableRow
-                        slot="row"
-                        slot-scope="{ item }"
-                        :locale="locale"
-                        :item="item"
-                        @deleted="loadTranslations"
-                    />
-                </Table>
+                        <TranslationsTableRow
+                            slot="row"
+                            slot-scope="{ item }"
+                            :locale="locale"
+                            :item="item"
+                            @deleted="loadTranslations"
+                        />
+                    </Table>
+
+                    <!-- Pagination -->
+                    <pagination-simple
+                        :next="hasNextPage"
+                        :previous="hasPreviousPage"
+                        :pages="totalPages"
+                        :page="currentPage"
+                        :per-page="perPage"
+                        :resource-count-label="countLabel"
+                        :current-resource-count="translations.length"
+                        :all-matching-resource-count="allMatchingCount"
+                        @page="selectPage"
+                    >
+                        <span class="text-sm text-80 px-4">{{ countLabel }}</span>
+                    </pagination-simple>
+                </template>
             </loading-view>
         </card>
     </div>
@@ -80,10 +97,15 @@
 
 <script>
 import Table from '../components/Table';
-import {Minimum} from "laravel-nova";
+import {InteractsWithQueryString, Minimum, Paginatable, PerPageable} from "laravel-nova";
 import TranslationsTableRow from "../components/TranslationsTableRow";
 
 export default {
+    mixins: [
+        InteractsWithQueryString,
+        Paginatable,
+        PerPageable,
+    ],
     components: {
         TranslationsTableRow,
         Table,
@@ -93,8 +115,14 @@ export default {
             debouncer: null,
             loading: true,
             search: '',
-            translations: [],
+            response: null,
+            allMatchingCount: 0,
         }
+    },
+    watch: {
+        currentPage() {
+            this.loadTranslations()
+        },
     },
     created() {
         this.debouncer = _.debounce(callback => callback(), 500)
@@ -108,15 +136,18 @@ export default {
 
             this.$nextTick(() => {
                 return Minimum(
-                    Nova.request().get(`/nova-vendor/translations/translations/${this.locale}`, {params: {search: encodeURI(this.search)}}),
+                    Nova.request().get(`/nova-vendor/translations/translations/${this.locale}`, {params: this.requestQueryString}),
                     300
                 )
                     .then(({data}) => {
-                        this.translations = data
+                        this.response = data
+                        this.perPage = data.per_page
+                        this.allMatchingCount = data.total
                         this.loading = false
                     })
             })
         },
+
         performSearch(event) {
             if (this.loading) {
                 return;
@@ -125,14 +156,61 @@ export default {
             this.debouncer(() => {
                 // Only search if we're not tabbing into the field
                 if (event.which !== 9) {
+                    this.selectPage(1);
                     this.loadTranslations();
                 }
             })
         },
+
+        selectPage(page) {
+            this.updateQueryString({[this.pageParameter]: page})
+        },
     },
     computed: {
+        translations() {
+            return this.response ? this.response.data : [];
+        },
+
         locale() {
             return this.$route.params.locale;
+        },
+
+        hasNextPage() {
+            return Boolean(
+                this.response && this.response.next_page_url
+            )
+        },
+
+        hasPreviousPage() {
+            return Boolean(
+                this.response && this.response.prev_page_url
+            )
+        },
+
+        totalPages() {
+            return Math.ceil(this.allMatchingCount / this.perPage)
+        },
+
+        countLabel() {
+            const first = this.perPage * (this.currentPage - 1)
+
+            return (
+                this.translations.length &&
+                `${Nova.formatNumber(first + 1)}-${Nova.formatNumber(
+                    first + this.translations.length
+                )} ${this.__('of')} ${Nova.formatNumber(this.allMatchingCount)}`
+            )
+        },
+
+        pageParameter() {
+            return 'page'
+        },
+
+        requestQueryString() {
+            return {
+                search: this.search,
+                page: this.currentPage,
+            }
         },
     },
 }
