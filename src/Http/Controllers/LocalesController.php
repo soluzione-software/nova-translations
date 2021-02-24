@@ -47,4 +47,11 @@ class LocalesController extends Controller
 
         return Response::download($file, "$locale.csv");
     }
+
+    public function sync(string $locale)
+    {
+        Translations::sync($locale);
+
+        return Response::noContent();
+    }
 }

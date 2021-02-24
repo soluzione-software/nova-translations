@@ -2,34 +2,6 @@
     <TableRow>
         <td>{{ item }}</td>
         <td class="td-fit text-right pr-6 align-middle">
-            <!-- Import Link -->
-            <span class="inline-flex">
-                <button
-                    v-tooltip.click="__('nova-translations::import')"
-                    class="text-70 hover:text-primary mr-3"
-                    @click.prevent="openImportModal"
-                >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                         xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round"
-                                                                  stroke-width="2"
-                                                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                </button>
-            </span>
-            <!-- Export Link -->
-            <span class="inline-flex">
-                <a
-                    :href="`/nova-vendor/translations/locales/${this.item}/export`"
-                    v-tooltip.click="__('nova-translations::export')"
-                    class="cursor-pointer text-70 hover:text-primary mr-3 inline-flex items-center"
-                >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                    </svg>
-                </a>
-            </span>
-
             <!-- View Link -->
             <span class="inline-flex">
                 <router-link
@@ -42,8 +14,54 @@
                         },
                     }"
                 >
-                <icon type="view" width="22" height="18" view-box="0 0 22 16"/>
+                    <icon type="view" width="20" height="20" view-box="-1 -2 23 20"/>
                 </router-link>
+            </span>
+
+            <!-- Sync Link -->
+            <span class="inline-flex">
+                <button
+                    v-tooltip.click="__('nova-translations::synchronize')"
+                    class="text-70 hover:text-primary mr-3"
+                    :disabled="isWorking"
+                    @click.prevent="sync"
+                >
+                    <svg fill="none" stroke="currentColor" width="20" height="20" viewBox="2 2 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                </button>
+            </span>
+
+            <!-- Import Link -->
+            <span class="inline-flex">
+                <button
+                    v-tooltip.click="__('nova-translations::import')"
+                    class="text-70 hover:text-primary mr-3"
+                    @click.prevent="openImportModal"
+                >
+                    <svg fill="none" stroke="currentColor" width="20" height="20" viewBox="2 2 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                </button>
+            </span>
+
+            <!-- Export Link -->
+            <span class="inline-flex">
+                <a
+                    :href="`/nova-vendor/translations/locales/${this.item}/export`"
+                    v-tooltip.click="__('nova-translations::export')"
+                    class="cursor-pointer text-70 hover:text-primary mr-3 inline-flex items-center"
+                >
+                    <svg fill="none" stroke="currentColor" width="20" height="20" viewBox="2 2 20 20"
+                         xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                </a>
             </span>
 
             <!-- Delete Link -->
@@ -180,6 +198,28 @@ export default {
                 });
         },
 
+        async sync() {
+            this.isWorking = true;
+
+            try {
+                await this.createSyncRequest()
+
+                Nova.success(this.__('nova-translations::locale_synchronized'))
+
+                this.importModalOpen = false;
+                this.validationErrors = new Errors();
+            } catch (error) {
+                Nova.error(
+                        this.__('There was a problem submitting the form.') +
+                        ' "' +
+                        error.response.statusText +
+                        '"'
+                    )
+            } finally {
+                this.isWorking = false;
+            }
+        },
+
         openImportModal() {
             this.importModalOpen = true;
         },
@@ -226,6 +266,11 @@ export default {
 
             return Nova.request()
                 .post(`/nova-vendor/translations/locales/${this.item}/import`, formData);
+        },
+
+        createSyncRequest() {
+            return Nova.request()
+                .post(`/nova-vendor/translations/locales/${this.item}/sync`);
         },
     }
 }
