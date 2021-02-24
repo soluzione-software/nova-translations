@@ -2,6 +2,7 @@
 
 namespace SoluzioneSoftware\NovaTranslations\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Response;
 use SoluzioneSoftware\LaravelTranslations\Facades\Translations;
@@ -11,9 +12,17 @@ use SoluzioneSoftware\NovaTranslations\Http\Requests\Translations\UpdateRequest;
 
 class TranslationsController extends Controller
 {
-    public function get(string $locale)
+    public function get(Request $request, string $locale)
     {
+        $search = strtolower((string) $request->input('search'));
+
         $translations = Translations::getTranslations($locale)
+            ->filter(function (array $translation) use ($search) {
+                return empty($search)
+                    || str_contains(strtolower($translation['namespace']), $search)
+                    || str_contains(strtolower($translation['key']), $search)
+                    || str_contains(strtolower($translation['value']), $search);
+            })
             ->sortBy(function (array $item) {
                 return $item['namespace'].'_'.$item['key'];
             });

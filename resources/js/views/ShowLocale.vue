@@ -1,63 +1,81 @@
 <template>
-    <loading-view :loading="loading">
-        <div class="flex items-center mb-6">
-            <heading class="flex-grow">{{ __('nova-translations::translations') }}</heading>
-            <router-link
-                :to="{name: 'translations.translations.create', params: {locale: $route.params.locale}}"
-                class="btn btn-default btn-primary"
-            >
-                {{ __('nova-translations::create_translation') }}
-            </router-link>
-        </div>
+    <div>
+        <heading class="mb-3">{{ __('nova-translations::translations') }}</heading>
 
-        <card>
-            <div
-                v-if="!translations.length"
-                class="flex justify-center items-center px-6 py-8"
-            >
-                <div class="text-center">
-                    <svg
-                        class="mb-3"
-                        height="51"
-                        viewBox="0 0 65 51"
-                        width="65"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M56 40h2c.552285 0 1 .447715 1 1s-.447715 1-1 1h-2v2c0 .552285-.447715 1-1 1s-1-.447715-1-1v-2h-2c-.552285 0-1-.447715-1-1s.447715-1 1-1h2v-2c0-.552285.447715-1 1-1s1 .447715 1 1v2zm-5.364125-8H38v8h7.049375c.350333-3.528515 2.534789-6.517471 5.5865-8zm-5.5865 10H6c-3.313708 0-6-2.686292-6-6V6c0-3.313708 2.686292-6 6-6h44c3.313708 0 6 2.686292 6 6v25.049375C61.053323 31.5511 65 35.814652 65 41c0 5.522847-4.477153 10-10 10-5.185348 0-9.4489-3.946677-9.950625-9zM20 30h16v-8H20v8zm0 2v8h16v-8H20zm34-2v-8H38v8h16zM2 30h16v-8H2v8zm0 2v4c0 2.209139 1.790861 4 4 4h12v-8H2zm18-12h16v-8H20v8zm34 0v-8H38v8h16zM2 20h16v-8H2v8zm52-10V6c0-2.209139-1.790861-4-4-4H6C3.790861 2 2 3.790861 2 6v4h52zm1 39c4.418278 0 8-3.581722 8-8s-3.581722-8-8-8-8 3.581722-8 8 3.581722 8 8 8z"
-                            fill="#A8B9C5"
-                        />
-                    </svg>
+        <div class="flex mb-6">
+            <!-- Search -->
+            <div class="relative h-9 flex-no-shrink">
+                <icon type="search" class="absolute search-icon-center ml-3 text-70"/>
 
-                    <h3 class="text-base text-80 font-normal">
-                        {{ __('nova-translations::empty') }}
-                    </h3>
-                </div>
+                <input
+                    class="appearance-none form-search w-search pl-search shadow"
+                    :placeholder="__('Search')"
+                    type="search"
+                    v-model.trim="search"
+                    @keydown.stop="performSearch"
+                    spellcheck="false"
+                />
             </div>
 
-            <Table v-else :items="translations">
-                <template #head>
-                    <th class="text-left">
-                        <span>{{ __('nova-translations::namespace') }}</span>
-                    </th>
-                    <th class="text-left">
-                        <span>{{ __('nova-translations::key') }}</span>
-                    </th>
-                    <th class="text-left">
-                        <span>{{ __('nova-translations::value') }}</span>
-                    </th>
-                </template>
+            <div class="w-full text-right">
+                <router-link
+                    :to="{name: 'translations.translations.create', params: {locale: $route.params.locale}}"
+                    class="btn btn-default btn-primary"
+                >
+                    {{ __('nova-translations::create_translation') }}
+                </router-link>
+            </div>
+        </div>
+        <card>
+            <loading-view :loading="loading">
+                <div
+                    v-if="!translations.length"
+                    class="flex justify-center items-center px-6 py-8"
+                >
+                    <div class="text-center">
+                        <svg
+                            class="mb-3"
+                            height="51"
+                            viewBox="0 0 65 51"
+                            width="65"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M56 40h2c.552285 0 1 .447715 1 1s-.447715 1-1 1h-2v2c0 .552285-.447715 1-1 1s-1-.447715-1-1v-2h-2c-.552285 0-1-.447715-1-1s.447715-1 1-1h2v-2c0-.552285.447715-1 1-1s1 .447715 1 1v2zm-5.364125-8H38v8h7.049375c.350333-3.528515 2.534789-6.517471 5.5865-8zm-5.5865 10H6c-3.313708 0-6-2.686292-6-6V6c0-3.313708 2.686292-6 6-6h44c3.313708 0 6 2.686292 6 6v25.049375C61.053323 31.5511 65 35.814652 65 41c0 5.522847-4.477153 10-10 10-5.185348 0-9.4489-3.946677-9.950625-9zM20 30h16v-8H20v8zm0 2v8h16v-8H20zm34-2v-8H38v8h16zM2 30h16v-8H2v8zm0 2v4c0 2.209139 1.790861 4 4 4h12v-8H2zm18-12h16v-8H20v8zm34 0v-8H38v8h16zM2 20h16v-8H2v8zm52-10V6c0-2.209139-1.790861-4-4-4H6C3.790861 2 2 3.790861 2 6v4h52zm1 39c4.418278 0 8-3.581722 8-8s-3.581722-8-8-8-8 3.581722-8 8 3.581722 8 8 8z"
+                                fill="#A8B9C5"
+                            />
+                        </svg>
 
-                <TranslationsTableRow
-                    slot="row"
-                    slot-scope="{ item }"
-                    :locale="locale"
-                    :item="item"
-                    @deleted="loadTranslations"
-                />
-            </Table>
+                        <h3 class="text-base text-80 font-normal">
+                            {{ __('nova-translations::empty') }}
+                        </h3>
+                    </div>
+                </div>
+
+                <Table v-else :items="translations">
+                    <template #head>
+                        <th class="text-left">
+                            <span>{{ __('nova-translations::namespace') }}</span>
+                        </th>
+                        <th class="text-left">
+                            <span>{{ __('nova-translations::key') }}</span>
+                        </th>
+                        <th class="text-left">
+                            <span>{{ __('nova-translations::value') }}</span>
+                        </th>
+                    </template>
+
+                    <TranslationsTableRow
+                        slot="row"
+                        slot-scope="{ item }"
+                        :locale="locale"
+                        :item="item"
+                        @deleted="loadTranslations"
+                    />
+                </Table>
+            </loading-view>
         </card>
-    </loading-view>
+    </div>
 </template>
 
 <script>
@@ -72,9 +90,14 @@ export default {
     },
     data() {
         return {
+            debouncer: null,
             loading: true,
+            search: '',
             translations: [],
         }
+    },
+    created() {
+        this.debouncer = _.debounce(callback => callback(), 500)
     },
     mounted() {
         this.loadTranslations();
@@ -85,13 +108,25 @@ export default {
 
             this.$nextTick(() => {
                 return Minimum(
-                    Nova.request().get(`/nova-vendor/translations/translations/${this.locale}`),
+                    Nova.request().get(`/nova-vendor/translations/translations/${this.locale}`, {params: {search: encodeURI(this.search)}}),
                     300
                 )
                     .then(({data}) => {
                         this.translations = data
                         this.loading = false
                     })
+            })
+        },
+        performSearch(event) {
+            if (this.loading) {
+                return;
+            }
+
+            this.debouncer(() => {
+                // Only search if we're not tabbing into the field
+                if (event.which !== 9) {
+                    this.loadTranslations();
+                }
             })
         },
     },
