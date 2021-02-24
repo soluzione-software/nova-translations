@@ -110,7 +110,7 @@
                                     type="submit"
                                     :disabled="isWorking"
                                 >
-                                    {{ __('Upload') }}
+                                    {{ __('nova-translations::upload') }}
                                 </button>
                             </div>
                         </div>

@@ -24,5 +24,6 @@ return [
     'translation_created' => 'The translation was created!',
     'translation_updated' => 'The translation was updated!',
     'translations' => 'Translations',
+    'upload' => 'Upload',
     'value' => 'Value',
 ];
