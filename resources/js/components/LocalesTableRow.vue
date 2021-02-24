@@ -219,7 +219,6 @@ export default {
 
         createRequest() {
             let formData = new FormData();
-            formData.enctype = 'multipart/form-data'
 
             if (this.$refs.importFileField.file) {
                 formData.set('file', this.$refs.importFileField.file);
