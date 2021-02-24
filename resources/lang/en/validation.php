@@ -2,6 +2,7 @@
 
 return [
     'attributes' => [
+        'file' => 'file',
         'initialize' => 'initialize',
         'key' => 'key',
         'locale' => 'locale',

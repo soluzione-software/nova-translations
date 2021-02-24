@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/locales', 'LocalesController@get');
 Route::post('/locales', 'LocalesController@store');
 Route::delete('/locales/{locale}', 'LocalesController@delete');
+Route::post('/locales/{locale}/import', 'LocalesController@import');
+Route::get('/locales/{locale}/export', 'LocalesController@export');
 
 Route::get('/translations/{locale}', 'TranslationsController@get');
 Route::post('/translations/{locale}', 'TranslationsController@store');

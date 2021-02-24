@@ -10,7 +10,7 @@
         "php": ">=7.1.0",
         "laravel/framework": "5.8.*|^6.0|^7.0|^8.0",
         "laravel/nova": "~2.0|~3.0",
-        "soluzione-software/laravel-translations": "^0.2"
+        "soluzione-software/laravel-translations": "^0.3"
     },
     "repositories": [
         {
