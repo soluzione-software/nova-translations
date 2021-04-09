@@ -36,7 +36,7 @@ class UpdateRequest extends FormRequest
                 'max:300',
             ],
             'value' => [
-                'required',
+                'nullable',
                 'string',
             ],
         ];

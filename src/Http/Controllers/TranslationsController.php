@@ -66,7 +66,12 @@ class TranslationsController extends Controller
     {
         $data = $request->validated();
 
-        Translations::updateTranslation($locale, $data['key'], $data['value'], Arr::get($data, 'namespace'));
+        Translations::updateTranslation(
+            $locale,
+            $data['key'],
+            (string) Arr::get($data, 'value'),
+            Arr::get($data, 'namespace')
+        );
 
         return Response::noContent();
     }
