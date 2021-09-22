@@ -36,7 +36,7 @@ class TranslationsController extends Controller
                     || str_contains(strtolower($translation['value']), $search);
             })
             ->sortBy(function (array $item) {
-                return $item['namespace'].'_'.$item['key'];
+                return Arr::get($item, 'source', '').$item['namespace'].$item['key'];
             });
 
         $total = $translations->count();

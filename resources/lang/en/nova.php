@@ -22,6 +22,7 @@ return [
     'locales' => 'Locales',
     'namespace' => 'Namespace',
     'save' => 'Save',
+    'source' => 'Source',
     'synchronize' => 'Synchronize',
     'translation_created' => 'The translation was created!',
     'translation_updated' => 'The translation was updated!',

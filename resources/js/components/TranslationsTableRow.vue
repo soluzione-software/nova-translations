@@ -1,5 +1,6 @@
 <template>
     <TableRow>
+        <td>{{ item.source || '&mdash;' }}</td>
         <td>{{ item.namespace || '&mdash;' }}</td>
         <td>{{ item.key }}</td>
         <td style="min-width: 50%">

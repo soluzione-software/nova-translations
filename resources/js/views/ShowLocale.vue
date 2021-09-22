@@ -56,6 +56,9 @@
                     <Table :items="translations">
                         <template #head>
                             <th class="text-left">
+                                <span>{{ __('nova-translations::source') }}</span>
+                            </th>
+                            <th class="text-left">
                                 <span>{{ __('nova-translations::namespace') }}</span>
                             </th>
                             <th class="text-left">
